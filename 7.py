@@ -29,7 +29,7 @@ for p in perm:
     next_inp = 0
     while [m['pointer'] for m in memories] != [-1] * 5:
         for i in range(5):
-            o, point = ic.intcomputer(memories[i]['memory'], memories[i]['pointer'],
+            o, point, rel = ic.intcomputer(memories[i]['memory'], memories[i]['pointer'],
                                       [memories[i]['phase'] if not memories[i]['ran'] else next_inp, next_inp],
                                       op_mode=ic.PAUSE_ON_OUTPUT)
             memories[i]['ran'] = True

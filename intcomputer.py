@@ -18,7 +18,7 @@ PAUSE_ON_OUTPUT = 1
 RUN_TO_HALT = 2
 
 
-def intcomputer(mem, pointer, input_values, op_mode=RUN_TO_HALT, print_output=False):
+def intcomputer(mem, pointer, input_values, rel=0, op_mode=RUN_TO_HALT, print_output=False):
     def op_addr(p_offset, mode):
         if mode == POS:
             mem.extend([0] * (mem[pointer + p_offset] - len(mem) + 1))
@@ -32,7 +32,7 @@ def intcomputer(mem, pointer, input_values, op_mode=RUN_TO_HALT, print_output=Fa
     pointer = pointer
     last_output = None
     input_counter = 0
-    relative = 0
+    relative = rel
 
     while mem[pointer] != 99:
         act = mem[pointer]
@@ -63,7 +63,7 @@ def intcomputer(mem, pointer, input_values, op_mode=RUN_TO_HALT, print_output=Fa
                 print(mem[addr1])
             pointer += 2
             if op_mode == PAUSE_ON_OUTPUT:
-                return last_output, pointer
+                return last_output, pointer, relative
         elif opcode == ADD:
             mem[addr3] = mem[addr1] + mem[addr2]
             pointer += 4
@@ -94,4 +94,4 @@ def intcomputer(mem, pointer, input_values, op_mode=RUN_TO_HALT, print_output=Fa
 
         if pointer > len(mem) - 1:
             raise ValueError("Pointer out of range")
-    return last_output, -1
+    return last_output, -1, relative
