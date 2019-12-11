@@ -1,3 +1,4 @@
+from intcomputer import IntComputer
 import intcomputer as ic
 from copy import deepcopy
 
@@ -17,22 +18,21 @@ DIRS = {'U': ('L', 'R'),
 
 
 def painter(h, mem):
-    p = 0
-    x = y = 0
-    relative = 0
+    _x = _y = 0
     direction = 'U'
-    while p != -1:
-        inp = h.get((x, y), 0)
-        paint_to, p, relative = ic.intcomputer(mem, p, [inp], rel=relative, op_mode=ic.PAUSE_ON_OUTPUT)
-        if p != -1:
-            turn_to, p, relative = ic.intcomputer(mem, p, [inp], rel=relative, op_mode=ic.PAUSE_ON_OUTPUT)
+    computer = IntComputer(mem, run_mode=ic.PAUSE_ON_OUTPUT)
+    while not computer.halted:
+        inp = h.get((_x, _y), 0)
+        paint_to = computer.exec([inp]).get_last_output()
+        if not computer.halted:
+            turn_to = computer.exec([inp]).get_last_output()
         else:
             break
-        h[(x, y)] = paint_to
+        h[(_x, _y)] = paint_to
         direction = DIRS[direction][turn_to]
         dx, dy = DELTAS[direction]
-        x += dx
-        y += dy
+        _x += dx
+        _y += dy
 
 
 orig_mem = deepcopy(memory)
@@ -56,5 +56,5 @@ print("Puzzle 11.2: ")
 for y in range(minY, maxY + 1):
     sstr = ''
     for x in range(minX, maxX + 1):
-        sstr += '**' if hull.get((x, y), 0) == 1 else '  '
+        sstr += '##' if hull.get((x, y), 0) == 1 else '  '
     print(sstr)

@@ -1,5 +1,6 @@
 import copy
 from itertools import permutations
+from intcomputer import IntComputer
 import intcomputer as ic
 
 with open("data/7.txt") as f:
@@ -13,7 +14,7 @@ for phases in perm:
     next_inp = 0
     for phase in phases:
         memory = copy.deepcopy(memory)
-        next_inp = ic.intcomputer(memory, 0, [phase, next_inp], op_mode=ic.RUN_TO_HALT)[0]
+        next_inp = IntComputer(memory).exec([phase, next_inp]).get_last_output()
     max_thrust = max(max_thrust, next_inp)
 
 print("Puzzle 7.1: ", max_thrust)
@@ -22,21 +23,15 @@ max_thrust = -99999999999
 perm = permutations([5, 6, 7, 8, 9])
 
 for p in perm:
-    memories = []
-    for k in p:
-        memories.append({'memory': copy.deepcopy(orig_memory), 'pointer': 0,
-                         'phase': k, 'last': None, 'ran': False})
-    next_inp = 0
-    while [m['pointer'] for m in memories] != [-1] * 5:
-        for i in range(5):
-            o, point, rel = ic.intcomputer(memories[i]['memory'], memories[i]['pointer'],
-                                      [memories[i]['phase'] if not memories[i]['ran'] else next_inp, next_inp],
-                                      op_mode=ic.PAUSE_ON_OUTPUT)
-            memories[i]['ran'] = True
-            memories[i]['pointer'] = point
-            next_inp = o or next_inp
-            memories[i]['last'] = o or memories[i]['last']
+    computers = []
+    for i in range(5):
+        computers.append(IntComputer(copy.deepcopy(memory), run_mode=ic.PAUSE_ON_OUTPUT))
 
-        max_thrust = max(max_thrust, memories[4]['last'])
+    i2 = 0
+    while [c.halted for c in computers] != [True] * 5:
+        for i in range(5):
+            i1 = p[i] if computers[i].cold else i2
+            i2 = computers[i].exec([i1, i2]).get_last_output()
+        max_thrust = max(max_thrust, computers[4].get_last_output())
 
 print("Puzzle 7.2: ", max_thrust)
