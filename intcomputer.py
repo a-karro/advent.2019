@@ -171,3 +171,7 @@ class IntComputer:
 
     def get_outputs(self):
         return self.outputs
+
+    def reset_outputs(self):
+        self.outputs = []
+        return self
